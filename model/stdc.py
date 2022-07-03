@@ -5,17 +5,22 @@ import torch.nn.functional as F
 
 
 class ConvX(nn.Module):
-    def __init__(self, in_channel, out_channel, kernel_size=3, stride=1) -> None:
+    def __init__(self, in_channel, out_channel, kernel_size=3, stride=1, padding=1, bias=False, act='relu') -> None:
         super().__init__()
+        self.act = act
 
-        self.conv = nn.Conv2d(in_channel, out_channel, kernel_size, stride, 
-                              padding=kernel_size // 2, bias=False)
+        self.conv = nn.Conv2d(in_channel, out_channel, kernel_size=kernel_size, stride=stride, 
+                              padding=kernel_size // 2, bias=bias)
         self.bn = nn.BatchNorm2d(out_channel)
 
     def forward(self, x):
         x = self.conv(x)
         x = self.bn(x)
-        x = F.relu(x)
+
+        if self.act == 'leaky':
+            x = F.leaky_relu(x)
+        else:
+            x = F.relu(x)
 
         return x
 
@@ -136,7 +141,6 @@ class CatBottleneck(nn.Module):
         return out
 
 
-
 class STDCNet(nn.Module):
     def __init__(self, base=64, layers=[4, 5, 3], block_num=4, type="cat") -> None:
         super().__init__()
@@ -159,7 +163,7 @@ class STDCNet(nn.Module):
         self.init_params()
 
     def _make_layers(self, base, layers, block_num, block):
-        features = [ConvX(3, base // 2, 3, 2), ConvX(base // 2, base, 3, 2)]
+        features = [ConvX(3, base // 2, kernel_size=3, stride=2), ConvX(base // 2, base, kernel_size=3, stride=2)]
 
         for i, layer in enumerate(layers):
             for j in range(layer):
@@ -182,7 +186,6 @@ class STDCNet(nn.Module):
         feat32 = self.x32(feat16)
         
         return feat2, feat4, feat8, feat16, feat32
-
 
     def init_weight(self, pretrain_model):
         state_dict = torch.load(pretrain_model)["state_dict"]
