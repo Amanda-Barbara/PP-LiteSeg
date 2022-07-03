@@ -14,7 +14,7 @@ used as encoder to extract the features from different levels. The Simple Pyrami
 the global context. The Flexible and Lightweight Decoder (FLD) fuses the detail and semantic features from high level to low level and
 outputs the result. Remarkably, FLD uses the Unified Attention Fusion Module (UAFM) to strengthen feature representations.
 
-![PP-LiteSeg](image/net.png)
+![PP-LiteSeg](/image/net.png)
 
 ## Train
 
