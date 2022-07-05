@@ -197,6 +197,7 @@ class PPLiteSeg(nn.Module):
         for chan in decode_chans:
             cls = SegClassifier(chan, 64, n_classes)
             self.classifer.append(cls)
+        self.classifer = nn.Sequential(*self.classifer)
 
     def forward(self, x):
         h, w = x.size()[2:]
@@ -223,7 +224,7 @@ class PPLiteSeg(nn.Module):
 if __name__ == '__main__':
     model = PPLiteSeg(4)
     model.eval()
-    model.to('cpu')
-    x = torch.zeros((1, 3, 512, 1024))
+    model.to('cuda')
+    x = torch.zeros((1, 3, 512, 1024)).cuda()
     y = model(x)
     print(y.size())

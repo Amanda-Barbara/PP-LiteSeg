@@ -62,6 +62,8 @@ class AddBottleneck(nn.Module):
                 conv_layer = ConvX(out_planes // int(math.pow(2, idx)),  out_planes // int(math.pow(2, idx)))
 
             self.conv_list.append(conv_layer)
+        
+        self.conv_list = nn.Sequential(*self.conv_list)
 
     def forward(self, x):
         out_list = []
@@ -115,6 +117,8 @@ class CatBottleneck(nn.Module):
                 conv_layer = ConvX(out_planes // int(math.pow(2, idx)),  out_planes // int(math.pow(2, idx)))
 
             self.conv_list.append(conv_layer)
+        
+        self.conv_list = nn.Sequential(*self.conv_list)
 
     def forward(self, x):
         out_list = []
@@ -212,10 +216,8 @@ class STDCNet(nn.Module):
 
 
 if __name__ == '__main__':
-    import torchsummary
-
     model = STDCNet(base=64, layers=[4, 5, 3])
     model.eval()
-    model.to('cpu')
-
-    torchsummary.summary(model, (3, 512 ,512), 1, device='cpu')
+    model.to('cuda')
+    d_input = torch.zeros((1,3,224,224)).cuda()
+    model(d_input)
